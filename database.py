@@ -42,8 +42,8 @@ def create_database() -> None:
 def add_user(username, hashed_master, key) -> None:
     conn, cursor = connect_db()
     cursor.execute(f'''
-        INSERT INTO users ("username", "master_password", "key")
-        VALUES ("{username}", "{hashed_master}", "{key}")
+    INSERT INTO users ('username', 'master_password', 'key') 
+    VALUES ("{username}", "{hashed_master}", "{key}")
     ''')
 
     disconnect_db(conn)
@@ -59,7 +59,7 @@ def get_password(username) -> str:
 
     password = cursor.fetchone()
     disconnect_db(conn)
-    return password
+    return password[0]
 
 
 def get_userid(username) -> int:
@@ -72,7 +72,7 @@ def get_userid(username) -> int:
 
     user_id = cursor.fetchone()
     disconnect_db(conn)
-    return user_id
+    return user_id[0]
 
 
 def delete_user(user_id) -> None:
@@ -80,12 +80,12 @@ def delete_user(user_id) -> None:
 
     cursor.execute(f'''
         DELETE FROM users 
-        WHERE id = {user_id}
+        WHERE id = "{user_id}"
     ''')
 
     cursor.execute(f'''
         DELETE FROM services 
-        WHERE user_id = {user_id}
+        WHERE user_id = "{user_id}"
     ''')
 
     disconnect_db(conn)
@@ -101,7 +101,7 @@ def get_users() -> list:
 
     users = cursor.fetchall()
     disconnect_db(conn)
-    return users
+    return [x[0] for x in users]
 
 
 def get_encryption_key(user_id) -> str:
@@ -123,7 +123,7 @@ def add_service(service_name, username, password, user_id) -> None:
     conn, cursor = connect_db()
 
     cursor.execute(f'''
-        INSERT INTO services ("service_name", "username", "password", "user_id")
+        INSERT INTO services ('service_name', 'username', 'password', 'user_id')
         VALUES ("{service_name}", "{username}", "{password}", {user_id})
     ''')
 
