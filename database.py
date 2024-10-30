@@ -114,7 +114,8 @@ def get_encryption_key(user_id) -> str:
     ''')
 
     key = cursor.fetchone()
-    key = key[2:]
+    key = key[0]
+    # key = key[2:0]
     disconnect_db(conn)
     return key.encode()
 
@@ -141,7 +142,8 @@ def get_services(user_id) -> list:
 
     services = cursor.fetchall()
     disconnect_db(conn)
-    return services
+    return [x[0] for x in services]
+
 
 
 def retrieve_user_pass_from_service(user_id, service_name) -> tuple[str, str]:
@@ -195,3 +197,18 @@ def delete_service(user_id, service) -> None:
         WHERE user_id = "{user_id}"
         AND service_name = "{service}"
     ''')
+
+
+def check_if_service_exists(user_id, service, usern) -> int:
+    conn, cursor = connect_db()
+    cursor.execute(f'''
+        SELECT service_name, user_id, username
+        FROM services
+        WHERE service_name = "{service}" AND user_id = "{user_id}" AND username = "{usern}"
+    ''')
+
+    results = cursor.fetchall()
+    print(f'This is num of results: {len(results)}')
+    print(f'These are the results: {results}')
+    return len(results)  # If not zero, service exists
+
